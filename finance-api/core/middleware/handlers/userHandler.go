@@ -1,28 +1,37 @@
 package handlers
 
 import (
-	"context"
+	userRepo "finance-api-v1/core/database/repo"
+	//entity "finance-api-v1/core/entities"
 	"finance-api-v1/core/middleware/mainhandler"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type UserHandler interface {
-	GetUser(ctx context.Context)
+	GetUser(c *gin.Context, id uint)
+	//UpdateUser(ctx context.Context, user *entity.User)
 }
 
 type Handler struct {
-	testas
+	userRepo userRepo.UserRepo
 }
 
-func GetUser(context *gin.Context) {
-	mainhandler.HandleRequest(context, func(c *gin.Context) *mainhandler.Response {
-		currentUser := User{ID: 1, UserName: "testas"}
+func (h *Handler) GetUser(c *gin.Context, id uint) {
 
-		return mainhandler.NewSuccessResponse(http.StatusOK, currentUser)
+	var user, err = h.userRepo.Get(c, id)
+
+	if err != nil {
+		mainhandler.NewInternalErrorResponse(err)
+	}
+
+	mainhandler.HandleRequest(c, func(c *gin.Context) *mainhandler.Response {
+		return mainhandler.NewSuccessResponse(http.StatusOK, user)
 	})
 }
 
-func NewUserHandler() *Handler {
-	return &UserHandler{}
+func NewUserHandler(repo userRepo.UserRepo) UserHandler {
+	return &Handler{
+		userRepo: repo,
+	}
 }

@@ -2,13 +2,15 @@ package entity
 
 import (
 	"encoding/json"
-	"finance-api-v1/core/common"
 	"fmt"
+	"time"
 )
 
 type User struct {
-	common.Base
-	UserName string `gorm:"column:userName"`
+	ID        uint      `gorm:"column:id"`
+	UserName  string    `gorm:"column:userName"`
+	CreatedAt time.Time `gorm:"column:created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
 func (user User) String() string {
